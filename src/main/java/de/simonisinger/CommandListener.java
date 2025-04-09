@@ -38,5 +38,6 @@ public class CommandListener extends ListenerAdapter {
             SlashCommandData commandRequest = command.build();
             discordCommands.addCommands(commandRequest).queue();
         }
+        discordCommands.queue();
     }
 }
