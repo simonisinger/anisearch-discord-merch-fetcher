@@ -36,7 +36,9 @@ public class CommandListener extends ListenerAdapter {
         CommandListUpdateAction discordCommands = client.updateCommands();
         for (Command command : commands) {
             SlashCommandData commandRequest = command.build();
-            discordCommands.addCommands(commandRequest).queue();
+			//noinspection ResultOfMethodCallIgnored
+			discordCommands.addCommands(commandRequest);
         }
+        discordCommands.queue();
     }
 }
