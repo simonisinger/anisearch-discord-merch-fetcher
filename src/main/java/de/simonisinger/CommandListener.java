@@ -20,6 +20,7 @@ public class CommandListener extends ListenerAdapter {
         commands.add(new RemoveChannelCommand());
         commands.add(new ListFeedsCommand());
         commands.add(new InviteCommand());
+        commands.add(new GithubCommand());
     }
 
     @Override
