@@ -1,6 +1,6 @@
 package de.simonisinger.commands;
 
-import de.simonisinger.FeedChannel;
+import de.simonisinger.channels.DiscordFeedChannel;
 import de.simonisinger.Main;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -25,10 +25,10 @@ public class ListFeedsCommand implements Command {
 
 	@Override
 	public void handle(SlashCommandInteractionEvent event) {
-		List<FeedChannel> feeds = Main.cache.getFeedsFromChannelId(event.getChannelIdLong());
+		List<DiscordFeedChannel> feeds = Main.cache.getFeedsFromChannelId(event.getChannelIdLong());
 		StringBuilder embedContent = new StringBuilder();
 		for (int i = 0; i < feeds.size(); i++) {
-			FeedChannel feed = feeds.get(i);
+			DiscordFeedChannel feed = feeds.get(i);
 			embedContent.append(i+1)
 					.append(") Medium: ")
 					.append(feed.getProductType().name())

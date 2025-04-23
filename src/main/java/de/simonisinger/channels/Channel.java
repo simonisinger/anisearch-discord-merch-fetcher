@@ -1,4 +1,7 @@
-package de.simonisinger;
+package de.simonisinger.channels;
+
+import de.simonisinger.Product;
+import de.simonisinger.UpdatedProduct;
 
 import java.util.List;
 

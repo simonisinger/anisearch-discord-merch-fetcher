@@ -1,8 +1,7 @@
 package de.simonisinger.commands;
 
-import de.simonisinger.FeedChannel;
+import de.simonisinger.channels.DiscordFeedChannel;
 import de.simonisinger.Main;
-import de.simonisinger.ProductCache;
 import de.simonisinger.ProductType;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionContextType;
@@ -56,7 +55,7 @@ public class AddChannelCommand implements Command {
 
 		// add feed to productcache
 		Main.cache.addFeed(
-				new FeedChannel(
+				new DiscordFeedChannel(
 						channelId,
 						Locale.forLanguageTag(language),
 						ProductType.valueOf(medium)

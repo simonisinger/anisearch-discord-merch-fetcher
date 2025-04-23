@@ -1,8 +1,9 @@
-package de.simonisinger;
+package de.simonisinger.channels;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import de.simonisinger.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -15,13 +16,13 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class FeedChannel implements Channel {
+public class DiscordFeedChannel implements Channel {
 
 	final protected long channelId;
 	final protected Locale language;
 	final protected ProductType productType;
 
-	public FeedChannel(
+	public DiscordFeedChannel(
 			@JsonProperty("channelId") long channelId,
 			@JsonProperty("language") Locale language,
 			@JsonProperty("productType") ProductType productType

@@ -1,6 +1,6 @@
 package de.simonisinger.commands;
 
-import de.simonisinger.FeedChannel;
+import de.simonisinger.channels.DiscordFeedChannel;
 import de.simonisinger.Main;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -29,7 +29,7 @@ public class RemoveChannelCommand implements Command {
 	@Override
 	public void handle(SlashCommandInteractionEvent event) {
 		long channelId = event.getChannelIdLong();
-		List<FeedChannel> feeds = Main.cache.getFeedsFromChannelId(channelId);
+		List<DiscordFeedChannel> feeds = Main.cache.getFeedsFromChannelId(channelId);
 		int index;
 		try {
 			index = Objects.requireNonNull(event.getOption("index")).getAsInt();

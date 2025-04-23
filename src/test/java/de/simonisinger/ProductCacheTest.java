@@ -1,6 +1,7 @@
 package de.simonisinger;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import de.simonisinger.channels.DiscordFeedChannel;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +23,7 @@ class ProductCacheTest {
 		new File("db/feeds.json").delete();
 		cache = new ProductCache();
 		cache.addFeed(
-				new FeedChannel(
+				new DiscordFeedChannel(
 						1,
 						Locale.forLanguageTag("de"),
 						ProductType.BOOK
@@ -39,7 +40,7 @@ class ProductCacheTest {
 	@org.junit.jupiter.api.Test
 	void addFeed() {
 		cache.addFeed(
-				new FeedChannel(
+				new DiscordFeedChannel(
 						1,
 						Locale.forLanguageTag("de"),
 						ProductType.DVD
@@ -57,7 +58,7 @@ class ProductCacheTest {
 
 	@org.junit.jupiter.api.Test
 	void getFeedsFromChannelId() {
-		List<FeedChannel> feeds = cache.getFeedsFromChannelId(1);
+		List<DiscordFeedChannel> feeds = cache.getFeedsFromChannelId(1);
 		Assertions.assertThat(feeds).hasSize(1);
 		Assertions.assertThat(feeds.getFirst()).isEqualTo(cache.productFeeds.getFirst());
 		Assertions.assertThat(cache.getFeedsFromChannelId(2)).isEmpty();

@@ -1,5 +1,6 @@
 package de.simonisinger;
 
+import de.simonisinger.channels.DiscordFeedChannel;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -12,11 +13,11 @@ import java.util.Locale;
 
 class FeedChannelTest {
 
-	static FeedChannel feed;
+	static DiscordFeedChannel feed;
 
 	@BeforeAll
 	public static void setup() {
-		feed = new FeedChannel(
+		feed = new DiscordFeedChannel(
 				56565464,
 				Locale.forLanguageTag("ger"),
 				ProductType.DVD

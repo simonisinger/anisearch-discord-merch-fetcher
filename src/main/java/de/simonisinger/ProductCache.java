@@ -2,6 +2,7 @@ package de.simonisinger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import de.simonisinger.channels.DiscordFeedChannel;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -15,7 +16,7 @@ import static java.lang.Integer.parseInt;
 
 public class ProductCache extends TimerTask {
 	protected final ArrayList<Product> products = new ArrayList<>();
-	protected final ArrayList<FeedChannel> productFeeds = new ArrayList<>();
+	protected final ArrayList<DiscordFeedChannel> productFeeds = new ArrayList<>();
 
 
 	// inits the products and productsfeed cache
@@ -24,18 +25,8 @@ public class ProductCache extends TimerTask {
 		initFeeds();
 	}
 
-	public void addFeed(FeedChannel feed) {
-		productFeeds.add(feed);
-		saveFeeds();
-	}
-
-	public void removeFeed(FeedChannel feed) {
-		productFeeds.remove(feed);
-		saveFeeds();
-	}
-
-	public List<FeedChannel> getFeedsFromChannelId(long channelId) {
-		return productFeeds.stream().filter(feed -> feed.channelId == channelId).toList();
+	public List<DiscordFeedChannel> getFeedsFromChannelId(long channelId) {
+		return productFeeds.stream().filter(feed -> feed.getChannelId() == channelId).toList();
 	}
 
 	String requestData(URI url) throws IOException {
@@ -89,7 +80,7 @@ public class ProductCache extends TimerTask {
 
 				try {
 					if (product.isEmpty()) {
-						Product newProduct = createProduct(productId, productJson);
+						Product newProduct = new Product(productId, productJson);
 						// Prevent to be readded if the timer is less than a day
 						if (now.isEqual(newProduct.getReleaseDate())) {
 							continue;
@@ -100,7 +91,7 @@ public class ProductCache extends TimerTask {
 					} else {
 						LocalDate newDate = LocalDate.parse(productJson.getString("date"));
 						if (newDate.isAfter(product.get().getReleaseDate())) {
-							Product newProduct = createProduct(productId, productJson);
+							Product newProduct = new Product(productId, productJson);
 							updatedProducts.get(Locale.forLanguageTag(language))
 									.add(new UpdatedProduct(product.get(), newProduct));
 							products.remove(product.get());
@@ -119,19 +110,19 @@ public class ProductCache extends TimerTask {
 			}
 		}
 
-		for (FeedChannel feed : this.productFeeds) {
-			Locale feedLanguage = feed.language;
+		for (DiscordFeedChannel feed : this.productFeeds) {
+			Locale feedLanguage = feed.getLanguage();
 			List<UpdatedProduct> filteredUpdatedProduct = updatedProducts.get(feedLanguage)
 					.stream()
-					.filter(updatedProduct -> updatedProduct.oldProduct().getTypes().contains(feed.productType))
+					.filter(updatedProduct -> updatedProduct.oldProduct().getTypes().contains(feed.getProductType()))
 					.toList();
 			List<Product> filteredNewProduct = newProducts.get(feedLanguage)
 					.stream()
-					.filter(product -> product.getTypes().contains(feed.productType))
+					.filter(product -> product.getTypes().contains(feed.getProductType()))
 					.toList();
 			List<Product> releaseTodayProduct = releaseTodayProducts.get(feedLanguage)
 					.stream()
-					.filter(product -> product.getTypes().contains(feed.productType))
+					.filter(product -> product.getTypes().contains(feed.getProductType()))
 					.toList();
 			feed.update(filteredNewProduct, filteredUpdatedProduct, releaseTodayProduct);
 		}
@@ -157,7 +148,7 @@ public class ProductCache extends TimerTask {
 				fileWriter.close();
 			} else {
 				ObjectMapper mapper = getMapper();
-				List<FeedChannel> productFeeds = Arrays.stream(mapper.readValue(productFeedsFile, FeedChannel[].class)).toList();
+				List<DiscordFeedChannel> productFeeds = Arrays.stream(mapper.readValue(productFeedsFile, DiscordFeedChannel[].class)).toList();
 
 				this.productFeeds.clear();
 				this.productFeeds.addAll(productFeeds);
@@ -198,43 +189,6 @@ public class ProductCache extends TimerTask {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	private void saveFeeds() {
-		try {
-			ObjectMapper objectMapper = getMapper();
-			objectMapper.writeValue(new File("db/feeds.json"), productFeeds);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private Product createProduct(int anisearchId, JSONObject productJson) {
-		List<ProductType> mediumTypes = productJson.getJSONArray("medium")
-				.toList()
-				.stream()
-				.map(id -> (int) id)
-				.toList()
-				.stream().map(ProductType::fromMediumId).toList();
-
-		List<Shop> shops = new ArrayList<>();
-		if (productJson.get("shops").getClass() == JSONObject.class) {
-			shops = productJson.getJSONObject("shops")
-					.toMap()
-					.entrySet()
-					.stream()
-					.map(entry -> new Shop(entry.getKey(), URI.create((String) entry.getValue())))
-					.toList();
-		}
-
-		return new Product(
-				anisearchId,
-				productJson.getString("title"),
-				mediumTypes,
-				LocalDate.parse(productJson.getString("date")),
-				Locale.forLanguageTag("language"),
-				shops
-		);
 	}
 
 	@Override
