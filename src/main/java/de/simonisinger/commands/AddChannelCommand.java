@@ -11,9 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 
 
 public class AddChannelCommand implements Command {
@@ -24,6 +22,14 @@ public class AddChannelCommand implements Command {
 
 	@Override
 	public SlashCommandData build() {
+        Map<String, String> languageMap = Map.ofEntries(
+                Map.entry("de", "German"),
+                Map.entry("en", "English"),
+                Map.entry("es", "Spanish"),
+                Map.entry("fr", "French"),
+                Map.entry("it", "Italian"),
+                Map.entry("ja", "Japanese")
+        );
 		return Commands.slash(this.getName(), "Add a channel to the channel list")
 				.setContexts(InteractionContextType.GUILD)
 				.addOptions(
@@ -32,7 +38,14 @@ public class AddChannelCommand implements Command {
 								"language",
 								"The language filter for the feed",
 								true
-						),
+						).addChoices(
+                                languageMap.keySet().stream().map(
+                                        language -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(
+                                                languageMap.get(language),
+                                                language
+                                        )
+                                ).toList()
+                        ),
 
 						new OptionData(
 								OptionType.STRING,
