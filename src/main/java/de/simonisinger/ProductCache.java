@@ -120,19 +120,20 @@ public class ProductCache extends TimerTask {
 		}
 
 		for (FeedChannel feed : this.productFeeds) {
-			Locale feedLanguage = feed.language;
-			List<UpdatedProduct> filteredUpdatedProduct = updatedProducts.get(feedLanguage)
-					.stream()
-					.filter(updatedProduct -> updatedProduct.oldProduct().getTypes().contains(feed.productType))
-					.toList();
-			List<Product> filteredNewProduct = newProducts.get(feedLanguage)
-					.stream()
-					.filter(product -> product.getTypes().contains(feed.productType))
-					.toList();
-			List<Product> releaseTodayProduct = releaseTodayProducts.get(feedLanguage)
+            Locale feedLanguage = feed.language;
+
+            List<UpdatedProduct> filteredUpdatedProduct = updatedProducts.containsKey(feedLanguage) ? updatedProducts.get(feedLanguage)
+                    .stream()
+                    .filter(updatedProduct -> updatedProduct.oldProduct().getTypes().contains(feed.productType))
+                    .toList() : new ArrayList<>();
+			List<Product> filteredNewProduct = newProducts.containsKey(feedLanguage) ? newProducts.get(feedLanguage)
 					.stream()
 					.filter(product -> product.getTypes().contains(feed.productType))
-					.toList();
+					.toList() : new ArrayList<>();
+			List<Product> releaseTodayProduct = releaseTodayProducts.containsKey(feedLanguage) ? releaseTodayProducts.get(feedLanguage)
+					.stream()
+					.filter(product -> product.getTypes().contains(feed.productType))
+					.toList() : new ArrayList<>();
 			feed.update(filteredNewProduct, filteredUpdatedProduct, releaseTodayProduct);
 		}
 		cleanupProducts(currentProductsList);
