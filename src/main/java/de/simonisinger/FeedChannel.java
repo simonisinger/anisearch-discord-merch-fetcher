@@ -6,12 +6,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -117,7 +119,12 @@ public class FeedChannel implements Channel {
 
 	protected void sendEmbed(MessageEmbed embed) {
 		JDA client = Main.getDiscordClient();
-		Objects.requireNonNull(client.getTextChannelById(channelId)).sendMessageEmbeds(embed).queue();
+        GuildChannel channel = client.getGuildChannelById(channelId);
+        switch (channel) {
+            case ThreadChannel threadChannel -> threadChannel.sendMessageEmbeds(embed).queue();
+            case TextChannel textChannel -> textChannel.sendMessageEmbeds(embed).queue();
+            case null, default -> System.err.println("Channel with ID " + channelId + " not found or not supported");
+        }
 	}
 
 	@JsonIgnore
