@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -120,10 +121,14 @@ public class FeedChannel implements Channel {
 	protected void sendEmbed(MessageEmbed embed) {
 		JDA client = Main.getDiscordClient();
         GuildChannel channel = client.getGuildChannelById(channelId);
-        switch (channel) {
-            case ThreadChannel threadChannel -> threadChannel.sendMessageEmbeds(embed).queue();
-            case TextChannel textChannel -> textChannel.sendMessageEmbeds(embed).queue();
-            case null, default -> System.err.println("Channel with ID " + channelId + " not found or not supported");
+        try {
+            switch (channel) {
+                case ThreadChannel threadChannel -> threadChannel.sendMessageEmbeds(embed).queue();
+                case TextChannel textChannel -> textChannel.sendMessageEmbeds(embed).queue();
+                case null, default -> System.err.println("Channel with ID " + channelId + " not found or not supported");
+            }
+        } catch (InsufficientPermissionException e) {
+            System.err.println("Could not send embed to channel with ID " + channelId + " because of permission '" + e.getPermission().getName() + "'");
         }
 	}
 
