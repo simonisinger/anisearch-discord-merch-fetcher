@@ -19,7 +19,8 @@ class FeedChannelTest {
 		feed = new FeedChannel(
 				56565464,
 				Locale.forLanguageTag("ger"),
-				ProductType.DVD
+				ProductType.DVD,
+                0
 		);
 	}
 

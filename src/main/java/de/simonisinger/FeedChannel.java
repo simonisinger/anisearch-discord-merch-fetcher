@@ -23,16 +23,19 @@ public class FeedChannel implements Channel {
 	final protected long channelId;
 	final protected Locale language;
 	final protected ProductType productType;
+    final protected long creatorId;
 
 	public FeedChannel(
-			@JsonProperty("channelId") long channelId,
-			@JsonProperty("language") Locale language,
-			@JsonProperty("productType") ProductType productType
-	) {
+            @JsonProperty("channelId") long channelId,
+            @JsonProperty("language") Locale language,
+            @JsonProperty("productType") ProductType productType,
+            @JsonProperty("creatorId") long creatorId
+    ) {
 		this.channelId = channelId;
 		this.language = language;
 		this.productType = productType;
-	}
+        this.creatorId = creatorId;
+    }
 
 	@JsonIgnore
 	@Override

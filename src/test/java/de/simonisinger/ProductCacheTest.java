@@ -25,7 +25,8 @@ class ProductCacheTest {
 				new FeedChannel(
 						1,
 						Locale.forLanguageTag("de"),
-						ProductType.BOOK
+						ProductType.BOOK,
+                        0
 				)
 		);
 	}
@@ -42,7 +43,8 @@ class ProductCacheTest {
 				new FeedChannel(
 						1,
 						Locale.forLanguageTag("de"),
-						ProductType.DVD
+						ProductType.DVD,
+                        0
 				)
 		);
 		Assertions.assertThat(cache.productFeeds).hasSize(2);

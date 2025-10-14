@@ -2,7 +2,6 @@ package de.simonisinger.commands;
 
 import de.simonisinger.FeedChannel;
 import de.simonisinger.Main;
-import de.simonisinger.ProductCache;
 import de.simonisinger.ProductType;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionContextType;
@@ -67,12 +66,13 @@ public class AddChannelCommand implements Command {
 
 		long channelId = event.getChannelIdLong();
 
-		// add feed to productcache
+		// add feed to the productcache
 		Main.cache.addFeed(
 				new FeedChannel(
 						channelId,
 						Locale.forLanguageTag(language),
-						ProductType.valueOf(medium)
+						ProductType.valueOf(medium),
+                        event.getUser().getIdLong()
 				)
 		);
 
