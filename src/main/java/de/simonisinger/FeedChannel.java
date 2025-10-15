@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -22,20 +23,25 @@ public class FeedChannel implements Channel {
 	final protected long channelId;
 	final protected Locale language;
 	final protected ProductType productType;
+    final protected long creatorId;
+	private boolean errorSent = false;
 
 	public FeedChannel(
-			@JsonProperty("channelId") long channelId,
-			@JsonProperty("language") Locale language,
-			@JsonProperty("productType") ProductType productType
-	) {
+            @JsonProperty("channelId") long channelId,
+            @JsonProperty("language") Locale language,
+            @JsonProperty("productType") ProductType productType,
+            @JsonProperty("creatorId") long creatorId
+    ) {
 		this.channelId = channelId;
 		this.language = language;
 		this.productType = productType;
-	}
+        this.creatorId = creatorId;
+    }
 
 	@JsonIgnore
 	@Override
 	public void update(List<Product> newProducts, List<UpdatedProduct> updatedProducts, List<Product> releaseTodayProducts) {
+		errorSent = false;
 		if (!newProducts.isEmpty()) {
 			generateMessageEmbeds(
 					this::generateNewProductString,
@@ -120,10 +126,28 @@ public class FeedChannel implements Channel {
 	protected void sendEmbed(MessageEmbed embed) {
 		JDA client = Main.getDiscordClient();
         GuildChannel channel = client.getGuildChannelById(channelId);
-        switch (channel) {
-            case ThreadChannel threadChannel -> threadChannel.sendMessageEmbeds(embed).queue();
-            case TextChannel textChannel -> textChannel.sendMessageEmbeds(embed).queue();
-            case null, default -> System.err.println("Channel with ID " + channelId + " not found or not supported");
+        try {
+            switch (channel) {
+                case ThreadChannel threadChannel -> threadChannel.sendMessageEmbeds(embed).queue();
+                case TextChannel textChannel -> textChannel.sendMessageEmbeds(embed).queue();
+                case null, default -> System.err.println("Channel with ID " + channelId + " not found or not supported");
+            }
+        } catch (InsufficientPermissionException e) {
+            System.err.println("Could not send embed to channel with ID " + channelId + " because of permission '" + e.getPermission().getName() + "'");
+			if (!errorSent) {
+				errorSent = true;
+
+				client.retrieveUserById(creatorId).queue(
+						user -> user.openPrivateChannel()
+								.queue(privateChannel -> privateChannel
+										.sendMessage("Could not send Merch updates to <#" +
+												channelId + "> because of permission '" +
+												e.getPermission().getName() + "'"
+										)
+										.queue()
+						)
+				);
+			}
         }
 	}
 
@@ -148,5 +172,10 @@ public class FeedChannel implements Channel {
 	@JsonGetter("channelId")
 	public long getChannelId() {
 		return channelId;
+	}
+
+	@JsonGetter("creatorId")
+	public long getCreatorId() {
+		return creatorId;
 	}
 }
