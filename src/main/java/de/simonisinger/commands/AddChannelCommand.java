@@ -3,8 +3,10 @@ package de.simonisinger.commands;
 import de.simonisinger.FeedChannel;
 import de.simonisinger.Main;
 import de.simonisinger.ProductType;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionContextType;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -31,6 +33,7 @@ public class AddChannelCommand implements Command {
         );
 		return Commands.slash(this.getName(), "Add a channel to the channel list")
 				.setContexts(InteractionContextType.GUILD)
+				.setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MODERATE_MEMBERS))
 				.addOptions(
 						new OptionData(
 								OptionType.STRING,
