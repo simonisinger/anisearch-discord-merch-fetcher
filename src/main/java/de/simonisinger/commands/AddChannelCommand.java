@@ -72,7 +72,7 @@ public class AddChannelCommand implements Command {
 						channelId,
 						Locale.forLanguageTag(language),
 						ProductType.valueOf(medium),
-                        event.getUser().getIdLong()
+                        Objects.requireNonNull(event.getMember()).getIdLong()
 				)
 		);
 

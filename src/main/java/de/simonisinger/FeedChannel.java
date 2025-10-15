@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,7 @@ public class FeedChannel implements Channel {
 	final protected Locale language;
 	final protected ProductType productType;
     final protected long creatorId;
+	private boolean errorSent = false;
 
 	public FeedChannel(
             @JsonProperty("channelId") long channelId,
@@ -40,6 +42,7 @@ public class FeedChannel implements Channel {
 	@JsonIgnore
 	@Override
 	public void update(List<Product> newProducts, List<UpdatedProduct> updatedProducts, List<Product> releaseTodayProducts) {
+		errorSent = false;
 		if (!newProducts.isEmpty()) {
 			generateMessageEmbeds(
 					this::generateNewProductString,
@@ -132,6 +135,12 @@ public class FeedChannel implements Channel {
             }
         } catch (InsufficientPermissionException e) {
             System.err.println("Could not send embed to channel with ID " + channelId + " because of permission '" + e.getPermission().getName() + "'");
+			if (!errorSent) {
+				errorSent = true;
+				Objects.requireNonNull(client.getUserById(creatorId))
+						.openPrivateChannel()
+						.queue(privateChannel -> privateChannel.sendMessage("Could not send Merch updates to #" + channelId).queue());
+			}
         }
 	}
 
@@ -156,5 +165,10 @@ public class FeedChannel implements Channel {
 	@JsonGetter("channelId")
 	public long getChannelId() {
 		return channelId;
+	}
+
+	@JsonGetter("creatorId")
+	public long getCreatorId() {
+		return creatorId;
 	}
 }
