@@ -15,7 +15,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -137,9 +136,17 @@ public class FeedChannel implements Channel {
             System.err.println("Could not send embed to channel with ID " + channelId + " because of permission '" + e.getPermission().getName() + "'");
 			if (!errorSent) {
 				errorSent = true;
-				Objects.requireNonNull(client.getUserById(creatorId))
-						.openPrivateChannel()
-						.queue(privateChannel -> privateChannel.sendMessage("Could not send Merch updates to #" + channelId).queue());
+
+				client.retrieveUserById(creatorId).queue(
+						user -> user.openPrivateChannel()
+								.queue(privateChannel -> privateChannel
+										.sendMessage("Could not send Merch updates to <#" +
+												channelId + "> because of permission '" +
+												e.getPermission().getName() + "'"
+										)
+										.queue()
+						)
+				);
 			}
         }
 	}
