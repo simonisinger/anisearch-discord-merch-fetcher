@@ -2,7 +2,9 @@ package de.simonisinger.commands;
 
 import de.simonisinger.FeedChannel;
 import de.simonisinger.Main;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -21,6 +23,7 @@ public class RemoveChannelCommand implements Command {
 	public SlashCommandData build() {
 		return Commands
 				.slash(this.getName(), "Remove a feed from a channel")
+				.setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MODERATE_MEMBERS))
 				.addOptions(
 						new OptionData(OptionType.INTEGER, "index", "Index of the Feed from the channel", true)
 				);

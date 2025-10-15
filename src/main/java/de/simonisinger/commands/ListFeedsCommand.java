@@ -3,8 +3,10 @@ package de.simonisinger.commands;
 import de.simonisinger.FeedChannel;
 import de.simonisinger.Main;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionContextType;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
@@ -20,6 +22,7 @@ public class ListFeedsCommand implements Command {
 	public SlashCommandData build() {
 		return Commands
 				.slash(this.getName(), "Lists all feeds for this channel")
+				.setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MODERATE_MEMBERS))
 				.setContexts(InteractionContextType.GUILD);
 	}
 
