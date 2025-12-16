@@ -70,6 +70,7 @@ public class FeedChannel implements Channel {
 	protected void generateMessageEmbeds(Function<Object, String> generator, List<Object> products, String titleString) {
 		List<String> productStrings = products.stream().map(generator).toList();
 		StringBuilder currentString = new StringBuilder();
+        titleString += " (" + productType.name() + " - " + language.getLanguage().toUpperCase() +")";
 		for (String productString : productStrings) {
 			if (currentString.length() + productString.length() > 2500) {
 				sendEmbed(generateEmbed(titleString, currentString.toString()));
