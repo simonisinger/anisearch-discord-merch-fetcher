@@ -53,6 +53,15 @@ public class ProductCache extends TimerTask {
 		return contentBuilder.toString();
 	}
 
+	public Product updateProduct(List<Product> currentProductsList, Product product, int productId, JSONObject productJson) {
+		Product newProduct = createProduct(productId, productJson);
+
+		products.remove(product);
+		products.add(newProduct);
+		currentProductsList.add(newProduct);
+		return newProduct;
+	}
+
 	void update() {
 		JSONObject json;
 		try {
@@ -100,12 +109,12 @@ public class ProductCache extends TimerTask {
 					} else {
 						LocalDate newDate = LocalDate.parse(productJson.getString("date"));
 						if (newDate.isAfter(product.get().getReleaseDate())) {
-							Product newProduct = createProduct(productId, productJson);
+							Product newProduct = updateProduct(currentProductsList, product.get(), productId, productJson);
 							updatedProducts.get(Locale.forLanguageTag(language))
 									.add(new UpdatedProduct(product.get(), newProduct));
-							products.remove(product.get());
-							products.add(newProduct);
-							currentProductsList.add(newProduct);
+						} else if (!product.get().getTitle().equals(productJson.getString("title"))) {
+							Product newProduct = updateProduct(currentProductsList, product.get(), productId, productJson);
+							newProducts.get(Locale.forLanguageTag(language)).add(newProduct);
 						} else if (newDate.isEqual(now)) {
 							releaseTodayProducts.get(Locale.forLanguageTag(language)).add(product.get());
 							products.remove(product.get());
