@@ -87,7 +87,10 @@ public class ProductCache extends TimerTask {
 		LocalDate now = LocalDate.now();
 
 		for (String language : json.keySet()) {
-			JSONObject languageProducts = json.getJSONObject(language);
+			JSONObject languageProducts = json.optJSONObject(language);
+			if (languageProducts == null) {
+				continue;
+			}
 			for (String productIdString : languageProducts.keySet()) {
 				int productId = parseInt(productIdString);
 				Optional<Product> product = products
